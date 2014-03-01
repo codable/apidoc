@@ -2,14 +2,19 @@
   "name": "apidoc",
   "version": "0.3.0",
   "description": "RESTful web API Documentation Generator",
-  "author": "Peter Rottmann <rottmann@inveris.de>",
+  "author": {
+    "name": "Peter Rottmann",
+    "email": "rottmann@inveris.de"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/apidoc/apidoc.git"
   },
   "main": "./lib/apidoc",
-  "bin": "bin/apidoc",
+  "bin": {
+    "apidoc": "bin/apidoc"
+  },
   "keywords": [
     "api",
     "apidoc",
@@ -36,5 +41,16 @@
     "grunt-contrib-jshint": "~0.7.2",
     "grunt-simple-mocha": "~0.4.0",
     "should": "~2.1.1"
-  }
+  },
+  "readme": "# apiDoc 0.3.0\n\nGenerates a RESTful web API Documentation.\n\nDocumentation at [apidocjs.com](http://apidocjs.com).\n\n[Example](http://apidocjs.com/example/) output.\n\n\n## Installation\n\n`npm install apidoc -g`\n\n\n## Example\n\n`apidoc -i example/ -o doc/`\n\nCreates from input files a documentation in path `doc/`.\n\n\n## Grunt Module\n\n[grund-apidoc](https://github.com/apidoc/grunt-apidoc) `npm install grunt-apidoc`.\n\n\n## Changelog\n\n[CHANGELOG.md](https://github.com/apidoc/apidoc/blob/master/CHANGELOG.md)\n\n\n## License\n\nCopyright (c) 2013 inveris OHG\nAuthor Peter Rottmann <rottmann@inveris.de>\nLicensed under the MIT license.\n",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/apidoc/apidoc/issues"
+  },
+  "homepage": "https://github.com/apidoc/apidoc",
+  "_id": "apidoc@0.3.0",
+  "dist": {
+    "shasum": "f0d016afb13871b77f3788f99eb3f22bb914bef3"
+  },
+  "_from": "."
 }

@@ -56,12 +56,12 @@ require([
 	/**
 	 * Data transform.
 	 */
-	// Grouped by group
+	// Grouped by package
 	var apiByGroup = _.groupBy(api, function(entry) {
-		return entry.group;
+		return entry.package;
 	});
 
-	// Grouped by group and name
+	// Grouped by package and name
 	var apiByGroupAndName = {};
 	$.each(apiByGroup, function(index, entries) {
 		apiByGroupAndName[index] = _.groupBy(entries, function(entry) {
@@ -70,14 +70,14 @@ require([
 	});
 
 	/**
-	 * Sort api by group - name - title.
+	 * Sort api by package - name - title.
 	 */
 	var newList = [];
 	var umlauts = { "ä": "ae", "ü": "ue", "ö": "oe", "ß": "ss" };
-	$.each(apiByGroupAndName, function(index, groupEntries) {
-		// Titel der ersten Einträge von group[].name[] ermitteln (name hat Versionsliste)
+	$.each(apiByGroupAndName, function(index, packageEntries) {
+		// Titel der ersten Einträge von package[].name[] ermitteln (name hat Versionsliste)
 		var titles = {};
-		$.each(groupEntries, function(index, entries) {
+		$.each(packageEntries, function(index, entries) {
 			var title = entries[0].title;
 			if(title)
 			{
@@ -92,7 +92,7 @@ require([
 		// Einzelne Elemente der neuen Liste hinzufügen.
 		values.forEach(function(name) {
 			var values = name.split( "#~#");
-			groupEntries[values[1]].forEach(function(entry) {
+			packageEntries[values[1]].forEach(function(entry) {
 				newList.push(entry);
 			}); // forEach
 		}); // forEach
@@ -108,7 +108,7 @@ require([
 	apiVersions[apiProject.version] = 1;
 
 	$.each(api, function(index, entry) {
-		apiGroups[entry.group] = 1;
+		apiGroups[entry.package] = 1;
 		apiVersions[entry.version] = 1;
 	});
 
@@ -124,24 +124,24 @@ require([
 	 * Create Navigationlist.
 	 */
 	var nav = [];
-	apiGroups.forEach(function(group) {
+	apiGroups.forEach(function(package) {
 		// Mainmenu-Entry.
 		nav.push({
-			group: group,
+			package: package,
 			isHeader: true,
-			title: group
+			title: package
 		});
 
 		// Add Submenu.
 		var oldName = "";
 		api.forEach(function(entry) {
-			if(entry.group === group)
+			if(entry.package === package)
 			{
 				if(oldName !== entry.name)
 				{
 					nav.push({
 						title: entry.title,
-						group: group,
+						package: package,
 						name: entry.name,
 						type: entry.type,
 						version: entry.version
@@ -151,7 +151,7 @@ require([
 				{
 					nav.push({
 						title: entry.title,
-						group: group,
+						package: package,
 						hidden: true,
 						name: entry.name,
 						type: entry.type,
@@ -167,7 +167,7 @@ require([
 	if(apiProject.apidoc)
 	{
 		nav.push({
-			group: "_",
+			package: "_",
 			isHeader: true,
 			title: locale.__("General"),
 			isFixed: true
@@ -208,28 +208,28 @@ require([
 	 *  Render Sections and Articles
 	 */
 	var articleVersions = {};
-	apiGroups.forEach(function(groupEntry) {
+	apiGroups.forEach(function(packageEntry) {
 		var articles = [];
 		var oldName = "";
 		var fields = {};
-		articleVersions[groupEntry] = {};
-		// Render all Articls of a group.
+		articleVersions[packageEntry] = {};
+		// Render all Articls of a package.
 		api.forEach(function(entry) {
-			if(groupEntry === entry.group)
+			if(packageEntry === entry.package)
 			{
 				if(oldName !== entry.name)
 				{
 					// Artikelversionen ermitteln.
 					api.forEach(function(versionEntry) {
-						if(groupEntry === versionEntry.group && entry.name === versionEntry.name)
+						if(packageEntry === versionEntry.package && entry.name === versionEntry.name)
 						{
-							if( ! articleVersions[entry.group][entry.name]) articleVersions[entry.group][entry.name] = [];
-							articleVersions[entry.group][entry.name].push(versionEntry.version);
+							if( ! articleVersions[entry.package][entry.name]) articleVersions[entry.package][entry.name] = [];
+							articleVersions[entry.package][entry.name].push(versionEntry.version);
 						}
 					});
 					fields = {
 						article: entry,
-						versions: articleVersions[entry.group][entry.name]
+						versions: articleVersions[entry.package][entry.name]
 					};
 				}
 				else
@@ -237,7 +237,7 @@ require([
 					fields = {
 						article: entry,
 						hidden: true,
-						versions: articleVersions[entry.group][entry.name]
+						versions: articleVersions[entry.package][entry.name]
 					};
 				}
 
@@ -248,7 +248,7 @@ require([
 
 				articles.push({
 					article: templateArticle(fields),
-					group: entry.group,
+					package: entry.package,
 					name: entry.name
 				});
 				oldName = entry.name;
@@ -257,8 +257,8 @@ require([
 
 		// Render Section with Articles.
 		var fields = {
-			group: groupEntry,
-			title: groupEntry,
+			package: packageEntry,
+			title: packageEntry,
 			articles: articles
 		};
 		$("#sections").append( templateSections(fields) );
@@ -319,10 +319,10 @@ require([
 		var version = $("#version strong").html();
 		$("#sidenav li").removeClass("is-new");
 		$("#sidenav li[data-version=\"" + version + "\"]").each(function(){
-			var group = $(this).data("group");
+			var package = $(this).data("package");
 			var name = $(this).data("name");
-			var length = $("#sidenav li[data-group=\"" + group + "\"][data-name=\"" + name + "\"]").length;
-			var index  = $("#sidenav li[data-group=\"" + group + "\"][data-name=\"" + name + "\"]").index($(this));
+			var length = $("#sidenav li[data-package=\"" + package + "\"][data-name=\"" + name + "\"]").length;
+			var index  = $("#sidenav li[data-package=\"" + package + "\"][data-name=\"" + name + "\"]").index($(this));
 			if(length === 1 || index === (length - 1))
 			{
 				$(this).addClass("is-new");
@@ -352,19 +352,19 @@ require([
 
 		// Show 1st equal or lower Version of each entry
 		$("article[data-version]").each(function(index) {
-			var group = $(this).data("group");
+			var package = $(this).data("package");
 			var name = $(this).data("name");
 			var version = $(this).data("version");
 			
 			if(version <= selectedVersion)
 			{
-				if($("article[data-group=\"" + group + "\"][data-name=\"" + name + "\"]:visible").length === 0)
+				if($("article[data-package=\"" + package + "\"][data-name=\"" + name + "\"]:visible").length === 0)
 				{
 					// Enable Article
-					$("article[data-group=\"" + group + "\"][data-name=\"" + name + "\"][data-version=\"" + version + "\"]").removeClass("hide");
+					$("article[data-package=\"" + package + "\"][data-name=\"" + name + "\"][data-version=\"" + version + "\"]").removeClass("hide");
 					// Enable Navigation
-					$("#sidenav li[data-group=\"" + group + "\"][data-name=\"" + name + "\"][data-version=\"" + version + "\"]").removeClass("hide");
-					$("#sidenav li.nav-header[data-group=\"" + group + "\"]").removeClass("hide");
+					$("#sidenav li[data-package=\"" + package + "\"][data-name=\"" + name + "\"][data-version=\"" + version + "\"]").removeClass("hide");
+					$("#sidenav li.nav-header[data-package=\"" + package + "\"]").removeClass("hide");
 				}
 			}
 		});
@@ -409,7 +409,7 @@ require([
 		var currentVersion = $button.find("strong").html();
 		$button.find("strong").html(selectedVersion);
 		
-		var group = $root.data("group");
+		var package = $root.data("package");
 		var name = $root.data("name");
 		var version = $root.data("version");
 		
@@ -418,20 +418,20 @@ require([
 		if(compareVersion === selectedVersion) return;
 		if( ! compareVersion && version == selectedVersion) return;
 		
-		if(    compareVersion && articleVersions[group][name][0] === selectedVersion
+		if(    compareVersion && articleVersions[package][name][0] === selectedVersion
 				|| version === selectedVersion
 		)
 		{
 			// Version des Eintrages wurde wieder auf höchste Version gesetzt (reset)
-			resetArticle(group, name, version);
+			resetArticle(package, name, version);
 		}
 		else
 		{
-			var $compareToArticle = $("article[data-group=\"" + group + "\"][data-name=\"" + name + "\"][data-version=\"" + selectedVersion + "\"]");
+			var $compareToArticle = $("article[data-package=\"" + package + "\"][data-name=\"" + name + "\"][data-version=\"" + selectedVersion + "\"]");
 
 			var sourceEntry = {};
 			var compareEntry = {};
-			$.each(apiByGroupAndName[group][name], function(index, entry) {
+			$.each(apiByGroupAndName[package][name], function(index, entry) {
 				if(entry.version === version) sourceEntry = entry;
 				if(entry.version === selectedVersion) compareEntry = entry;
 			});
@@ -439,7 +439,7 @@ require([
 			var fields = {
 				article: sourceEntry,
 				compare: compareEntry,
-				versions: articleVersions[group][name]
+				versions: articleVersions[package][name]
 			};
 
 			var entry = sourceEntry;
@@ -462,7 +462,7 @@ require([
 			$content.find(".versions li.version a").on("click", changeVersionCompareTo);
 			
 			// Navigation markieren
-			$("#sidenav li[data-group=\"" + group + "\"][data-name=\"" + name + "\"][data-version=\"" + currentVersion + "\"]").addClass("has-modifications");
+			$("#sidenav li[data-package=\"" + package + "\"][data-name=\"" + name + "\"][data-version=\"" + currentVersion + "\"]").addClass("has-modifications");
 
 			$root.remove(); 
 			// todo: bei Hauptversionswechsel oder zurückstellen auf höchste Eintragsversion, den Eintrag neu rendern
@@ -503,15 +503,15 @@ require([
 	/**
 	 * Render an Article.
 	 */
-	function renderArticle(group, name, version)
+	function renderArticle(package, name, version)
 	{
 		var entry = {};
-		$.each(apiByGroupAndName[group][name], function(index, currentEntry) {
+		$.each(apiByGroupAndName[package][name], function(index, currentEntry) {
 			if(currentEntry.version === version) entry = currentEntry;
 		});
 		var fields = {
 			article: entry,
-			versions: articleVersions[group][name]
+			versions: articleVersions[package][name]
 		};
 
 		if(entry.parameter && entry.parameter.fields) fields._hasTypeInParameterFields = _hasTypeInFields(entry.parameter.fields);
@@ -525,10 +525,10 @@ require([
 	/**
 	 * Render the original Article and remove the current visible Article.
 	 */
-	function resetArticle(group, name, version)
+	function resetArticle(package, name, version)
 	{
-		var $root = $("article[data-group=\"" + group + "\"][data-name=\"" + name + "\"]:visible");
-		var content = renderArticle(group, name, version);
+		var $root = $("article[data-package=\"" + package + "\"][data-name=\"" + name + "\"]:visible");
+		var content = renderArticle(package, name, version);
 
 		$root.after(content);
 		var $content = $root.next();
@@ -536,7 +536,7 @@ require([
 		// Event on.click muss neu zugewiesen werden (sollte eigentlich mit on automatisch funktionieren... sollte)
 		$content.find(".versions li.version a").on("click", changeVersionCompareTo);
 
-		$("#sidenav li[data-group=\"" + group + "\"][data-name=\"" + name + "\"][data-version=\"" + version + "\"]").removeClass("has-modifications");
+		$("#sidenav li[data-package=\"" + package + "\"][data-name=\"" + name + "\"][data-version=\"" + version + "\"]").removeClass("has-modifications");
 		
 		$root.remove(); 
 		return;
